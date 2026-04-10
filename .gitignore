@@ -1,0 +1,27 @@
+## Ignorar pastas de build (em qualquer subpasta)
+[Bb]in/
+[Oo]bj/
+
+## Visual Studio & VS Code
+.vs/
+.vscode/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+
+## Arquivos de Log e Lock
+*.log
+*.binlog
+project.lock.json
+project.fragment.lock.json
+*.nupkg
+*.snupkg
+
+## Testes
+TestResult.xml
+*.VisualState.xml
+
+## Outros lixos de sistema
+.DS_Store
+Thumbs.db
