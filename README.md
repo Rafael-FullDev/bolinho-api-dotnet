@@ -112,6 +112,6 @@ Este projeto faz parte do meu processo de aprendizado em desenvolvimento backend
 ## Autor
 
 Desenvolvido por Rafael
-[LinkedIn](www.linkedin.com/in/rafael-full-dev)
+[LinkedIn](https://www.linkedin.com/in/rafael-full-dev/)
 
 ---
