@@ -1,4 +1,6 @@
 using ASP.NET_Core_Web_API.Data;
+using ASP.NET_Core_Web_API.Repositories;
+using ASP.NET_Core_Web_API.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -12,6 +14,9 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<IBolinhoService, BolinhoService>();
+builder.Services.AddScoped<IBolinhoRepository, BolinhoRepository>();
 
 var app = builder.Build();
 

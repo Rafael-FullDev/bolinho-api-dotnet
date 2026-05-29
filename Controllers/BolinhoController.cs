@@ -1,8 +1,6 @@
-﻿using ASP.NET_Core_Web_API.Data;
-using ASP.NET_Core_Web_API.DTOs;
-using ASP.NET_Core_Web_API.Models;
+﻿using ASP.NET_Core_Web_API.DTOs;
+using ASP.NET_Core_Web_API.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 
 namespace ASP.NET_Core_Web_API.Controllers
 {
@@ -12,109 +10,66 @@ namespace ASP.NET_Core_Web_API.Controllers
     // herdando a controller base na classe taskcontroller
     public class BolinhoController : ControllerBase
     {
-        // criando uma instancia do banco de dados
-        private readonly AppDbContext _appDbContext;
+        private readonly IBolinhoService _bolinhoService;
 
-        public BolinhoController(AppDbContext appDbContext)
+        public BolinhoController(IBolinhoService bolinhoService)
         {
-            _appDbContext = appDbContext;
+            _bolinhoService = bolinhoService;
         }
 
-        // consultar os bolinhos do banco de dados e utilizando dto
         [HttpGet]
-        public async Task<IActionResult> GetBolinhos()
+        public async Task<IActionResult> ListarBolinhos()
         {
-            var bolinhos = await _appDbContext.Bolinhos
-        .Select(b => new BolinhoResponseDto
-        {
-            Id = b.Id,
-            Nome = b.Nome,
-            Descricao = b.Descrição,
-            Pronto = b.Pronto
-        })
-        .ToListAsync();
+            var bolinhos = await _bolinhoService.GetBolinhos();
+
             return Ok(bolinhos);
         }
 
-        // consultar os bolinhos do banco de dados por id
-
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetIdBolinho()
+        public async Task<IActionResult> GetIdBolinho(int id)
         {
-            var bolinho = await _appDbContext.Bolinhos.ToListAsync();
-
-            if(bolinho == null)
-            {
-                return BadRequest();
-            }
-
-            return Ok(bolinho);
-        }
-
-        // criando um bolinho e utilizando dto
-        [HttpPost]
-        public async Task<IActionResult> CriarBolinho(BolinhoCreateDto dto)
-        {
-            var Bolinho = new bolinho
-            {
-                Nome = dto.Nome,
-                Descrição = dto.Descricao,
-                Pronto = dto.Pronto
-            };
-
-            _appDbContext.Bolinhos.Add(Bolinho);
-
-            await _appDbContext.SaveChangesAsync();
-
-            var response = new BolinhoResponseDto
-            {
-                Id = Bolinho.Id,
-                Nome = Bolinho.Nome,
-                Descricao = Bolinho.Descrição,
-                Pronto = Bolinho.Pronto
-            };
-
-            return CreatedAtAction(nameof(GetIdBolinho), new { id = Bolinho.Id }, response);
-        }
-
-        // editar um bolinho atraves do id e utilizando dto
-        [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarBolinho(int id, BolinhoUpdateDto dto)
-        {
-            var bolinho = await _appDbContext.Bolinhos.FindAsync(id);
+            var bolinho = await _bolinhoService.GetIdBolinho(id);
 
             if (bolinho == null)
             {
                 return NotFound("Bolinho não encontrado.");
             }
 
-            bolinho.Nome = dto.Nome;
-            bolinho.Descrição = dto.Descricao;
-            bolinho.Pronto = dto.Pronto;
+            return Ok(bolinho);
+        }
 
-            await _appDbContext.SaveChangesAsync();
+        [HttpPost]
+        public async Task<IActionResult> CriarBolinho(BolinhoCreateDto dto)
+        {
+            var bolinho = await _bolinhoService.CriarBolinho(dto);
 
-            var response = new BolinhoResponseDto
+            return CreatedAtAction(nameof(GetIdBolinho), new { id = bolinho.Id }, bolinho);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> AtualizarBolinho(int id, BolinhoUpdateDto dto)
+        {
+            var bolinho = await _bolinhoService.AtualizarBolinho(id, dto);
+
+            if (bolinho == null)
             {
-                Id = bolinho.Id,
-                Nome = bolinho.Nome,
-                Descricao = bolinho.Descrição,
-                Pronto = bolinho.Pronto
-            };
+                return NotFound("Bolinho não encontrado.");
+            }
 
-            return Ok(response);
+            return Ok(bolinho);
         }
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteBolinho(int id)
         {
-            var bolinho = await _appDbContext.Bolinhos.FindAsync(id);
-            if (bolinho == null)
-                return NotFound();
-            _appDbContext.Bolinhos.Remove(bolinho);
-            await _appDbContext.SaveChangesAsync();
-            return Ok(bolinho);
-        }
+            var deletado = await _bolinhoService.DeleteBolinho(id);
 
+            if (!deletado)
+            {
+                return NotFound("Bolinho não encontrado.");
+            }
+
+            return NoContent();
+        }
     }
 }
