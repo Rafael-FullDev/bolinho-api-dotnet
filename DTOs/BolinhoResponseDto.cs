@@ -9,4 +9,9 @@ public class BolinhoResponseDto
     public string Descricao { get; set; } = string.Empty;
 
     public bool Pronto { get; set; }
+
+    public string Categoria { get; set; } = string.Empty;
+
+    public string ImagemUrl { get; set; } = string.Empty;
+
 }

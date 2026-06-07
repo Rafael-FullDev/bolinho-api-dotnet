@@ -10,5 +10,5 @@ public class AppDbContext : DbContext
     {
     }
 
-    public DbSet<bolinho> Bolinhos { get; set; }
+    public DbSet<Bolinho> Bolinhos { get; set; }
 }

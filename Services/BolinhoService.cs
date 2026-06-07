@@ -1,14 +1,11 @@
-﻿using ASP.NET_Core_Web_API.Data;
-using ASP.NET_Core_Web_API.DTOs;
-using ASP.NET_Core_Web_API.Models;
+﻿using ASP.NET_Core_Web_API.DTOs;
+using ASP.NET_Core_Web_API.Mappings;
 using ASP.NET_Core_Web_API.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace ASP.NET_Core_Web_API.Services;
 
 public class BolinhoService : IBolinhoService
 {
-    // criando uma instancia do banco de dados
     private readonly IBolinhoRepository _bolinhoRepository;
 
     public BolinhoService(IBolinhoRepository bolinhoRepository)
@@ -17,17 +14,11 @@ public class BolinhoService : IBolinhoService
     }
 
     // consultar os bolinhos do banco de dados e utilizando dto
-    public async Task<List<BolinhoResponseDto>> GetBolinhos()
+    public async Task<List<BolinhoResponseDto>> GetBolinhos(BolinhoFiltroDto filtro)
     {
-        var bolinhos = await _bolinhoRepository.GetBolinhos();
+        var bolinhos = await _bolinhoRepository.GetBolinhos(filtro);
 
-        return bolinhos.Select(b => new BolinhoResponseDto
-        {
-            Id = b.Id,
-            Nome = b.Nome,
-            Descricao = b.Descrição,
-            Pronto = b.Pronto
-        }).ToList();
+        return BolinhoMapper.ToResponseDtoList(bolinhos);
     }
 
     // consultar os bolinhos do banco de dados por id
@@ -40,34 +31,17 @@ public class BolinhoService : IBolinhoService
             return null;
         }
 
-        return new BolinhoResponseDto
-        {
-            Id = bolinho.Id,
-            Nome = bolinho.Nome,
-            Descricao = bolinho.Descrição,
-            Pronto = bolinho.Pronto
-        };
+        return BolinhoMapper.ToResponseDto(bolinho);
     }
 
     // criando um bolinho e utilizando dto
     public async Task<BolinhoResponseDto> CriarBolinho(BolinhoCreateDto dto)
     {
-        var Bolinho = new bolinho
-        {
-            Nome = dto.Nome,
-            Descrição = dto.Descricao,
-            Pronto = dto.Pronto
-        };
+        var bolinho = BolinhoMapper.ToModel(dto);
 
-        var bolinhoCriado = await _bolinhoRepository.CriarBolinho(Bolinho);
+        var bolinhoCriado = await _bolinhoRepository.CriarBolinho(bolinho);
 
-        return new BolinhoResponseDto
-        {
-            Id = Bolinho.Id,
-            Nome = Bolinho.Nome,
-            Descricao = Bolinho.Descrição,
-            Pronto = Bolinho.Pronto
-        };
+        return BolinhoMapper.ToResponseDto(bolinhoCriado);
     }
 
     // editar um bolinho atraves do id e utilizando dto
@@ -80,25 +54,16 @@ public class BolinhoService : IBolinhoService
             return null;
         }
 
-        bolinho.Nome = dto.Nome;
-        bolinho.Descrição = dto.Descricao;
-        bolinho.Pronto = dto.Pronto;
+        BolinhoMapper.UpdateModel(bolinho, dto);
 
         var bolinhoAtualizado = await _bolinhoRepository.AtualizarBolinho(bolinho);
 
-        return new BolinhoResponseDto
-        {
-            Id = bolinho.Id,
-            Nome = bolinho.Nome,
-            Descricao = bolinho.Descrição,
-            Pronto = bolinho.Pronto
-        };
+        return BolinhoMapper.ToResponseDto(bolinhoAtualizado!);
     }
 
     public async Task<bool> DeleteBolinho(int id)
     {
         var bolinho = await _bolinhoRepository.GetIdBolinho(id);
-
         if (bolinho == null)
             return false;
 

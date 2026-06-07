@@ -13,4 +13,11 @@ public class BolinhoCreateDto
     public string Descricao { get; set; } = string.Empty;
 
     public bool Pronto { get; set; } = true;
+
+    [Required(ErrorMessage = "A categoria é obrigatória.")]
+    [StringLength(80, ErrorMessage = "A categoria deve ter no máximo 80 caracteres.")]
+    public string Categoria { get; set; } = string.Empty;
+
+    [StringLength(500, ErrorMessage = "A URL da imagem deve ter no máximo 500 caracteres.")]
+    public string ImagemUrl { get; set; } = string.Empty;
 }

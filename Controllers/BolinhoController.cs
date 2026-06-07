@@ -1,4 +1,5 @@
 ﻿using ASP.NET_Core_Web_API.DTOs;
+using ASP.NET_Core_Web_API.Responses;
 using ASP.NET_Core_Web_API.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -7,7 +8,7 @@ namespace ASP.NET_Core_Web_API.Controllers
     [ApiController]
     [Route("bolinhos")]
 
-    // herdando a controller base na classe taskcontroller
+    // herdando a controller base na classe Bolinhocontroller
     public class BolinhoController : ControllerBase
     {
         private readonly IBolinhoService _bolinhoService;
@@ -18,45 +19,65 @@ namespace ASP.NET_Core_Web_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListarBolinhos()
+        public async Task<IActionResult> GetBolinhos([FromQuery] BolinhoFiltroDto filtro)
         {
-            var bolinhos = await _bolinhoService.GetBolinhos();
+            var bolinhos = await _bolinhoService.GetBolinhos(filtro);
 
-            return Ok(bolinhos);
+            return Ok(ApiResponse<List<BolinhoResponseDto>>.SucessoResponse(
+                bolinhos,
+                "Bolinhos listados com sucesso."
+            ));
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetIdBolinho(int id)
+        public async Task<IActionResult> GetBolinhoId(int id)
         {
             var bolinho = await _bolinhoService.GetIdBolinho(id);
 
             if (bolinho == null)
             {
-                return NotFound("Bolinho não encontrado.");
+                return NotFound(ApiResponse<BolinhoResponseDto>.ErroResponse(
+            "Bolinho não encontrado."
+        ));
             }
 
-            return Ok(bolinho);
+            return Ok(ApiResponse<BolinhoResponseDto>.SucessoResponse(
+        bolinho,
+        "Bolinho encontrado com sucesso."
+    ));
         }
 
         [HttpPost]
-        public async Task<IActionResult> CriarBolinho(BolinhoCreateDto dto)
+        public async Task<IActionResult> PostBolinho(BolinhoCreateDto dto)
         {
             var bolinho = await _bolinhoService.CriarBolinho(dto);
 
-            return CreatedAtAction(nameof(GetIdBolinho), new { id = bolinho.Id }, bolinho);
+            return CreatedAtAction(
+        nameof(GetBolinhoId),
+        new { id = bolinho.Id },
+        ApiResponse<BolinhoResponseDto>.SucessoResponse(
+            bolinho,
+            "Bolinho criado com sucesso."
+        )
+    );
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> AtualizarBolinho(int id, BolinhoUpdateDto dto)
+        public async Task<IActionResult> PutBolinho(int id, BolinhoUpdateDto dto)
         {
             var bolinho = await _bolinhoService.AtualizarBolinho(id, dto);
 
             if (bolinho == null)
             {
-                return NotFound("Bolinho não encontrado.");
+                return NotFound(ApiResponse<BolinhoResponseDto>.ErroResponse(
+                    "Bolinho não encontrado."
+                ));
             }
 
-            return Ok(bolinho);
+            return Ok(ApiResponse<BolinhoResponseDto>.SucessoResponse(
+        bolinho,
+        "Bolinho atualizado com sucesso."
+    ));
         }
 
         [HttpDelete("{id}")]
@@ -66,10 +87,15 @@ namespace ASP.NET_Core_Web_API.Controllers
 
             if (!deletado)
             {
-                return NotFound("Bolinho não encontrado.");
+                return NotFound(ApiResponse<object>.ErroResponse(
+                    "Bolinho não encontrado."
+                ));
             }
 
-            return NoContent();
+            return Ok(ApiResponse<object>.SucessoResponse(
+        null!,
+        "Bolinho deletado com sucesso."
+    ));
         }
     }
 }

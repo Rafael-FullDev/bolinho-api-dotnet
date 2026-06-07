@@ -1,16 +1,17 @@
-﻿using ASP.NET_Core_Web_API.Models;
+﻿using ASP.NET_Core_Web_API.DTOs;
+using ASP.NET_Core_Web_API.Models;
 
 namespace ASP.NET_Core_Web_API.Repositories;
 
 public interface IBolinhoRepository
 {
-    Task<List<bolinho>> GetBolinhos();
+    Task<List<Bolinho>> GetBolinhos(BolinhoFiltroDto filtro);
 
-    Task<bolinho?> GetIdBolinho(int id);
+    Task<Bolinho?> GetIdBolinho(int id);
 
-    Task<bolinho> CriarBolinho(bolinho bolinho);
+    Task<Bolinho> CriarBolinho(Bolinho bolinho);
 
-    Task<bolinho?> AtualizarBolinho(bolinho bolinho);
+    Task<Bolinho?> AtualizarBolinho(Bolinho bolinho);
 
-    Task<bool> DeleteBolinho(bolinho bolinho);
+    Task<bool> DeleteBolinho(Bolinho bolinho);
 }

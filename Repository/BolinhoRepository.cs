@@ -1,4 +1,5 @@
 ﻿using ASP.NET_Core_Web_API.Data;
+using ASP.NET_Core_Web_API.DTOs;
 using ASP.NET_Core_Web_API.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,17 +14,29 @@ public class BolinhoRepository : IBolinhoRepository
         _appDbContext = appDbContext;
     }
 
-    public async Task<List<bolinho>> GetBolinhos()
+    public async Task<List<Bolinho>> GetBolinhos(BolinhoFiltroDto filtro)
     {
-        return await _appDbContext.Bolinhos.ToListAsync();
+        var query = _appDbContext.Bolinhos.AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(filtro.Nome))
+        {
+            query = query.Where(b => b.Nome.Contains(filtro.Nome));
+        }
+
+        if (filtro.Pronto.HasValue)
+        {
+            query = query.Where(b => b.Disponivel == filtro.Pronto.Value);
+        }
+
+        return await query.ToListAsync();
     }
 
-    public async Task<bolinho?> GetIdBolinho(int id)
+    public async Task<Bolinho?> GetIdBolinho(int id)
     {
         return await _appDbContext.Bolinhos.FindAsync(id);
     }
 
-    public async Task<bolinho> CriarBolinho(bolinho bolinho)
+    public async Task<Bolinho> CriarBolinho(Bolinho bolinho)
     {
         _appDbContext.Bolinhos.Add(bolinho);
 
@@ -32,7 +45,7 @@ public class BolinhoRepository : IBolinhoRepository
         return bolinho;
     }
 
-    public async Task<bolinho?> AtualizarBolinho(bolinho bolinho)
+    public async Task<Bolinho?> AtualizarBolinho(Bolinho bolinho)
     {
         _appDbContext.Bolinhos.Update(bolinho);
 
@@ -41,7 +54,7 @@ public class BolinhoRepository : IBolinhoRepository
         return bolinho;
     }
 
-    public async Task<bool> DeleteBolinho(bolinho bolinho)
+    public async Task<bool> DeleteBolinho(Bolinho bolinho)
     {
         _appDbContext.Bolinhos.Remove(bolinho);
 

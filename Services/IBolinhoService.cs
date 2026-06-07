@@ -4,7 +4,7 @@ namespace ASP.NET_Core_Web_API.Services;
 
 public interface IBolinhoService
 {
-    Task<List<BolinhoResponseDto>> GetBolinhos();
+    Task<List<BolinhoResponseDto>> GetBolinhos(BolinhoFiltroDto filtro);
 
     Task<BolinhoResponseDto?> GetIdBolinho(int id);
 
